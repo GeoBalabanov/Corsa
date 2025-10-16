@@ -1,0 +1,10 @@
+DerivedData/
+build/
+**/*.xcuserdata/
+**/*.xcuserdatad/
+**/*.xcworkspace/xcuserdata/
+.swiftpm/
+.build/
+Pods/
+*.xcworkspace
+Carthage/Build/
