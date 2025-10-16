@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import SafariServices
 
 // MARK: - Music providers
 
@@ -17,25 +16,21 @@ enum MusicProvider: String, CaseIterable, Identifiable {
 
     var id: String { rawValue }
 
-    // Brand-tinted gradients (feel free to tweak)
+    // Brand-tinted backgrounds (tweak to match your Figma)
     var gradient: LinearGradient {
         switch self {
         case .spotify:
-            return LinearGradient(colors: [Color(hex: 0x0B3D18), Color(hex: 0x103E1F), Color.black.opacity(0.85)],
-                                  startPoint: .top,
-                                  endPoint: .bottom)
+            return LinearGradient(colors: [Color(hex: 0x193A22), Color(hex: 0x0F2A1A), .black.opacity(0.9)],
+                                  startPoint: .top, endPoint: .bottom)
         case .appleMusic:
-            return LinearGradient(colors: [Color(hex: 0x3F0B15), Color(hex: 0x2A0A0E), Color.black.opacity(0.85)],
-                                  startPoint: .top,
-                                  endPoint: .bottom)
+            return LinearGradient(colors: [Color(hex: 0x3F0B15), Color(hex: 0x2A0A0E), .black.opacity(0.9)],
+                                  startPoint: .top, endPoint: .bottom)
         case .youtubeMusic:
-            return LinearGradient(colors: [Color(hex: 0x3F0B0B), Color(hex: 0x220606), Color.black.opacity(0.85)],
-                                  startPoint: .top,
-                                  endPoint: .bottom)
+            return LinearGradient(colors: [Color(hex: 0x3F0B0B), Color(hex: 0x220606), .black.opacity(0.9)],
+                                  startPoint: .top, endPoint: .bottom)
         }
     }
 
-    // Brand color accent
     var accent: Color {
         switch self {
         case .spotify:      return Color(hex: 0x1DB954)
@@ -44,7 +39,6 @@ enum MusicProvider: String, CaseIterable, Identifiable {
         }
     }
 
-    // App deep link / website to open
     var openURL: URL {
         switch self {
         case .spotify:      return URL(string: "https://open.spotify.com/")!
@@ -53,7 +47,6 @@ enum MusicProvider: String, CaseIterable, Identifiable {
         }
     }
 
-    // Instruction heading copy
     var instructionsTitle: String {
         switch self {
         case .spotify:      return "Finding the right Spotify link:"
@@ -62,7 +55,7 @@ enum MusicProvider: String, CaseIterable, Identifiable {
         }
     }
 
-    // Logo asset name (add PNGs to Assets with these names)
+    // Add these logo assets to Assets.xcassets or replace names
     var logoAsset: String {
         switch self {
         case .spotify:      return "logo_spotify"
@@ -71,7 +64,6 @@ enum MusicProvider: String, CaseIterable, Identifiable {
         }
     }
 
-    // Placeholder example link
     var placeholder: String {
         switch self {
         case .spotify:      return "https://open.spotify.com/user/your-id"
@@ -110,18 +102,16 @@ struct RegistrationView: View {
                     .padding(.top, 8)
 
                     // Title
-                    Text("Enter your ")
-                        .font(.system(size: 34, weight: .bold))
+                    (Text("Enter your ")
                         .foregroundStyle(.white)
-                    + Text(provider.rawValue)
-                        .font(.system(size: 34, weight: .bold))
+                     + Text(provider.rawValue)
                         .foregroundStyle(provider.accent)
-                    + Text("\nprofile link")
+                     + Text("\nprofile link")
+                        .foregroundStyle(.white))
                         .font(.system(size: 34, weight: .bold))
-                        .foregroundStyle(.white)
 
                     // URL field
-                    HStack {
+                    HStack(spacing: 10) {
                         Image(systemName: "link")
                             .foregroundStyle(.white.opacity(0.7))
                         TextField(provider.placeholder, text: $profileURL)
@@ -200,13 +190,17 @@ struct RegistrationView: View {
                         Text("Please paste a valid \(provider.rawValue) profile URL.")
                     }
 
-                    // Skip option
+                    // Skip option — centered + cycles providers
                     Button {
-                        // TODO: handle skip (e.g., local playlist / continue without account)
-                        print("Skip provider")
+                        switch provider {
+                        case .spotify:      provider = .appleMusic
+                        case .appleMusic:   provider = .youtubeMusic
+                        case .youtubeMusic: provider = .spotify
+                        }
                     } label: {
                         Text("Skip, my music isn’t on \(provider.rawValue)")
-                            .foregroundStyle(.white.opacity(0.7))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .frame(maxWidth: .infinity, alignment: .center)
                     }
                     .buttonStyle(.plain)
                     .padding(.vertical, 8)
@@ -217,10 +211,9 @@ struct RegistrationView: View {
             }
         }
         .navigationBarTitleDisplayMode(.inline)
-        .toolbar(.hidden) // hide default bar for a cleaner look
+        .toolbar(.hidden) // cleaner top area
     }
 
-    // Simple URL validation
     private func isValidURL(_ text: String) -> Bool {
         guard let url = URL(string: text) else { return false }
         return ["http", "https"].contains(url.scheme?.lowercased() ?? "")
@@ -236,7 +229,6 @@ private struct ProviderTabs: View {
         HStack(spacing: 22) {
             ForEach(MusicProvider.allCases) { item in
                 VStack(spacing: 8) {
-                    // Top bar indicator
                     Capsule()
                         .fill(item == provider ? .white : .white.opacity(0.35))
                         .frame(width: 92, height: 6)
@@ -271,6 +263,8 @@ private struct Bullet: View {
         }
     }
 }
+
+
 
 
 
