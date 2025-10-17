@@ -72,12 +72,12 @@ struct LibraryView: View {
                                     }
                             }
                         }
-                        .padding(.horizontal, 16)
-                        .padding(.top, 6)
+                        .padding(.horizontal, 20)
+                        .padding(.top, 15)
 
                         InstructionCard()
                             .padding(.horizontal, 16)
-                            .padding(.top, 10)
+                            .padding(.top, 50)
 
                         // CTA — white text, dark pill (not blue)
                         Button {
@@ -136,10 +136,14 @@ struct LeatherBackdropReplica: View {
                     .scaledToFill()
                     .frame(width: geo.size.width, height: geo.size.height)
                     .clipped()
-                    .ignoresSafeArea()
+                    .ignoresSafeArea(edges: .all)
+                    // ↓ ensure it fully covers the bottom edge on every device
+                    .scaleEffect(1.08, anchor: .bottom)  // slight zoom, anchored at bottom
+                    .offset(y: 8)                        // nudge down a bit
             } else {
                 LinearGradient(colors: [Color.black, Color.black.opacity(0.94)],
                                startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .ignoresSafeArea(edges: .all)
                     .overlay(
                         Text("⚠️ Add asset named \"image4\" to your target")
                             .font(.footnote).padding(8)
@@ -242,7 +246,7 @@ struct InstructionCard: View {
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .blendMode(.plusLighter)
 
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 8) {
                 Text("Quick instructions:")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
 
