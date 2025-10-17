@@ -20,7 +20,7 @@ struct Playlist: Identifiable {
 
 struct LibraryView: View {
     @State private var selected: Playlist? = nil
-    @State private var showReady = false // ← added
+    @State private var showReady = false 
 
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 18), count: 3)
 
