@@ -20,7 +20,6 @@ struct Playlist: Identifiable {
 
 struct LibraryView: View {
     @State private var selected: Playlist? = nil
-    @State private var showSearch: Bool = false
 
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 18), count: 3)
 
@@ -35,62 +34,28 @@ struct LibraryView: View {
 
     var body: some View {
         ZStack {
-            LeatherBackdrop()
+            LeatherBackdropReplica()     // ← background image
 
             VStack(spacing: 16) {
+                // Header — left icons, middle spacer, right title+avatar
+                HStack(spacing: 12) {
+                    HStack(spacing: 12) {
+                        RoundIcon(system: "magnifyingglass")
+                        RoundIcon(system: "plus")
+                    }
 
-                // Tiny overline
-                HStack {
-                    Text("Playlist choice")
-                        .foregroundStyle(.white.opacity(0.7))
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                        .kerning(0.3)
-                    Spacer()
+                    Spacer(minLength: 8)
+
+                    HStack(spacing: 12) {
+                        Text("Your Library")
+                            .font(.system(size: 28, weight: .semibold, design: .rounded))
+                            .kerning(0.3)
+                            .lineLimit(1)
+                        Avatar()
+                    }
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 6)
-
-                // Header row: search, add, title centered, avatar
-                HStack(spacing: 12) {
-
-                    // Search icon button (opens sheet with search field if you want later)
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                        showSearch.toggle()
-                    } label: {
-                        Image(systemName: "magnifyingglass")
-                            .font(.system(size: 16, weight: .semibold))
-                            .frame(width: 36, height: 36)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
-
-                    // Add icon button
-                    Button {
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                    } label: {
-                        Image(systemName: "plus")
-                            .font(.system(size: 16, weight: .bold))
-                            .frame(width: 36, height: 36)
-                            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    }
-
-                    Spacer(minLength: 8)
-
-                    // Center title
-                    Text("Your Library")
-                        .font(.system(size: 28, weight: .semibold, design: .rounded))
-                        .kerning(0.3)
-
-                    Spacer(minLength: 8)
-
-                    // Avatar
-                    Circle()
-                        .fill(AngularGradient(colors: [.purple, .pink, .blue, .purple], center: .center))
-                        .overlay(Circle().stroke(.white.opacity(0.35), lineWidth: 1))
-                        .frame(width: 36, height: 36)
-                        .accessibilityLabel("Profile")
-                }
-                .padding(.horizontal, 16)
 
                 // Grid
                 ScrollView(showsIndicators: false) {
@@ -108,32 +73,34 @@ struct LibraryView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
 
-                    // Instructions card
                     InstructionCard()
                         .padding(.horizontal, 16)
-                        .padding(.top, 8)
+                        .padding(.top, 10)
 
-                    // CTA
+                    // CTA — white text, dark pill (not blue)
                     Button {
                         UINotificationFeedbackGenerator().notificationOccurred(.success)
                     } label: {
                         Text("Click & Select")
                             .font(.system(size: 20, weight: .semibold, design: .rounded))
+                            .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 52)
-                            .background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(.white.opacity(0.12)))
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(.white.opacity(0.12))
+                            )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                                     .stroke(.white.opacity(0.18), lineWidth: 1)
                             )
                     }
                     .padding(.horizontal, 24)
-                    .padding(.top, 6)
+                    .padding(.top, 8)
 
-                    // Footer link
                     VStack(spacing: 4) {
                         Text("Want to change platforms?")
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(.white.opacity(0.65))
                             .font(.footnote)
                         Button { } label: {
                             Text("Go back to Login page.")
@@ -143,18 +110,65 @@ struct LibraryView: View {
                     }
                     .padding(.vertical, 18)
                 }
+                .padding(.top, 18) // ← added space between header and playlist
             }
-            .padding(.bottom, 2)
         }
         .preferredColorScheme(.dark)
-        .sheet(isPresented: $showSearch) {
-            // Optional: simple search sheet to mirror the icon behavior
-            SearchSheet()
+    }
+}
+
+// MARK: - Background (now uses image4)
+
+struct LeatherBackdropReplica: View {
+    var body: some View {
+        GeometryReader { geo in
+            if let ui = UIImage(named: "image4") {
+                Image(uiImage: ui)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: geo.size.width, height: geo.size.height)
+                    .clipped()
+                    .ignoresSafeArea()
+            } else {
+                LinearGradient(colors: [Color.black, Color.black.opacity(0.94)],
+                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                    .overlay(
+                        Text("⚠️ Add asset named \"image4\" to your target")
+                            .font(.footnote).padding(8)
+                            .background(.black.opacity(0.6))
+                            .cornerRadius(8)
+                            .foregroundStyle(.white)
+                            .padding(),
+                        alignment: .topLeading
+                    )
+                    .ignoresSafeArea()
+            }
         }
     }
 }
 
-// MARK: - Components
+// MARK: - Small UI components
+
+struct RoundIcon: View {
+    var system: String
+    var body: some View {
+        Image(systemName: system)
+            .font(.system(size: 16, weight: .semibold))
+            .frame(width: 36, height: 36)
+            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .foregroundStyle(.white)
+    }
+}
+
+struct Avatar: View {
+    var body: some View {
+        Circle()
+            .fill(AngularGradient(colors: [.purple, .pink, .blue, .purple], center: .center))
+            .overlay(Circle().stroke(.white.opacity(0.35), lineWidth: 1))
+            .frame(width: 36, height: 36)
+            .accessibilityLabel("Profile")
+    }
+}
 
 struct PlaylistCard: View {
     let item: Playlist
@@ -162,17 +176,14 @@ struct PlaylistCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            AsyncImage(url: item.coverURL, transaction: .init(animation: .easeInOut)) { phase in
+            AsyncImage(url: item.coverURL) { phase in
                 switch phase {
                 case .empty:
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(.white.opacity(0.06))
-                        ProgressView().tint(.white.opacity(0.7))
-                    }
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(.white.opacity(0.06))
+                        .overlay(ProgressView().tint(.white.opacity(0.7)))
                 case .success(let image):
-                    image
-                        .resizable()
+                    image.resizable()
                         .scaledToFill()
                         .frame(height: 92)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
@@ -202,14 +213,12 @@ struct PlaylistCard: View {
                 .lineLimit(1)
 
             Text(item.subtitle)
-                .foregroundStyle(.secondary)
+                .foregroundStyle(.white.opacity(0.7))
                 .font(.system(size: 11, weight: .regular))
                 .lineLimit(1)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .contentShape(Rectangle())
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(item.title) by \(item.subtitle)")
     }
 }
 
@@ -220,8 +229,8 @@ struct InstructionCard: View {
                 .fill(.black.opacity(0.35))
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
 
-            // Soft spotlight
-            RadialGradient(colors: [.white.opacity(0.22), .clear], center: .center, startRadius: 20, endRadius: 240)
+            RadialGradient(colors: [.white.opacity(0.22), .clear],
+                           center: .center, startRadius: 20, endRadius: 240)
                 .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
                 .blendMode(.plusLighter)
 
@@ -231,9 +240,9 @@ struct InstructionCard: View {
 
                 VStack(alignment: .leading, spacing: 8) {
                     Label("Playlist will be played on shuffle", systemImage: "dot.square.fill")
-                    Label("No access to queue", systemImage: "dot.square.fill")
-                    Label("No album covers", systemImage: "dot.square.fill")
-                    Label("Only media player access", systemImage: "dot.square.fill")
+                    Label("No access to queue",               systemImage: "dot.square.fill")
+                    Label("No album covers",                  systemImage: "dot.square.fill")
+                    Label("Only media player access",         systemImage: "dot.square.fill")
                 }
                 .labelStyle(InstructionBulletStyle())
                 .foregroundStyle(.white.opacity(0.8))
@@ -254,52 +263,6 @@ struct InstructionBulletStyle: LabelStyle {
                 .foregroundStyle(.white.opacity(0.55))
             configuration.title
         }
-    }
-}
-
-struct LeatherBackdrop: View {
-    var body: some View {
-        ZStack {
-            LinearGradient(colors: [Color.black, Color.black.opacity(0.92)],
-                           startPoint: .topLeading, endPoint: .bottomTrailing)
-                .ignoresSafeArea()
-
-            RadialGradient(colors: [.clear, .black.opacity(0.55)],
-                           center: .center, startRadius: 0, endRadius: 520)
-                .ignoresSafeArea()
-
-            Rectangle()
-                .fill(.black.opacity(0.04))
-                .blendMode(.overlay)
-                .allowsHitTesting(false)
-        }
-    }
-}
-
-// Optional: search sheet shown after tapping the magnifier
-struct SearchSheet: View {
-    @Environment(\.dismiss) private var dismiss
-    @State private var query: String = ""
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 16) {
-                TextField("Search", text: $query)
-                    .textInputAutocapitalization(.never)
-                    .disableAutocorrection(true)
-                    .padding(.horizontal, 12)
-                    .frame(height: 44)
-                    .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-                    .padding(.horizontal, 16)
-                Spacer()
-            }
-            .navigationTitle("Search")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Done") { dismiss() }
-                }
-            }
-        }
-        .preferredColorScheme(.dark)
     }
 }
 
