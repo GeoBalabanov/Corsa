@@ -51,7 +51,7 @@ final class VoiceCommander: NSObject, ObservableObject {
             DispatchQueue.main.async { self.isAuthorized = (status == .authorized) }
         }
     }
-
+    
     func start() throws {
         guard !isListening else { return }
         try AVAudioSession.sharedInstance().setCategory(.record, mode: .measurement, options: .duckOthers)
@@ -234,7 +234,7 @@ struct PlayerView: View {
                         .fill(.white.opacity(0.15))
                         .frame(width: 40, height: 40)
                         .overlay(
-                            Image("image4")
+                            Image("image5")
                                 .resizable().scaledToFill()
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         )
