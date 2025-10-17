@@ -60,7 +60,7 @@ struct ReadyToGoView: View {
                 // Title
                 HStack {
                     Text("YOUR CAR IS\nREADY TO GO!")
-                        .font(.system(size: 32, weight: .light, design: .serif))
+                        .font(.system(size: 32, weight: .light, design: .default))
                         .italic()
                         .kerning(0.9)
                         .foregroundStyle(.white.opacity(0.95))
@@ -84,7 +84,7 @@ struct ReadyToGoView: View {
                         .frame(height: 52)
                         .background(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .fill(.white.opacity(0.12))
+                                .fill(.white.opacity(0.5))
                         )
                         .overlay(
                             RoundedRectangle(cornerRadius: 16, style: .continuous)

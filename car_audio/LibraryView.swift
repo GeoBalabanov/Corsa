@@ -20,6 +20,7 @@ struct Playlist: Identifiable {
 
 struct LibraryView: View {
     @State private var selected: Playlist? = nil
+    @State private var showReady = false // ← added
 
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 18), count: 3)
 
@@ -33,84 +34,91 @@ struct LibraryView: View {
     ]
 
     var body: some View {
-        ZStack {
-            LeatherBackdropReplica()     // ← background image
+        NavigationStack { // ← added
+            ZStack {
+                LeatherBackdropReplica()     // ← background image
 
-            VStack(spacing: 16) {
-                // Header — left icons, middle spacer, right title+avatar
-                HStack(spacing: 12) {
+                VStack(spacing: 16) {
+                    // Header — left icons, middle spacer, right title+avatar
                     HStack(spacing: 12) {
-                        RoundIcon(system: "magnifyingglass")
-                        RoundIcon(system: "plus")
-                    }
+                        HStack(spacing: 12) {
+                            RoundIcon(system: "magnifyingglass")
+                            RoundIcon(system: "plus")
+                        }
 
-                    Spacer(minLength: 8)
+                        Spacer(minLength: 8)
 
-                    HStack(spacing: 12) {
-                        Text("Your Library")
-                            .font(.system(size: 28, weight: .semibold, design: .rounded))
-                            .kerning(0.3)
-                            .lineLimit(1)
-                        Avatar()
-                    }
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 6)
-
-                // Grid
-                ScrollView(showsIndicators: false) {
-                    LazyVGrid(columns: columns, alignment: .center, spacing: 18) {
-                        ForEach(playlists) { item in
-                            PlaylistCard(item: item, isSelected: selected?.id == item.id)
-                                .onTapGesture {
-                                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
-                                        selected = item
-                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                                    }
-                                }
+                        HStack(spacing: 12) {
+                            Text("Your Library")
+                                .font(.system(size: 28, weight: .semibold, design: .rounded))
+                                .kerning(0.3)
+                                .lineLimit(1)
+                            Avatar()
                         }
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 6)
 
-                    InstructionCard()
-                        .padding(.horizontal, 16)
-                        .padding(.top, 10)
-
-                    // CTA — white text, dark pill (not blue)
-                    Button {
-                        UINotificationFeedbackGenerator().notificationOccurred(.success)
-                    } label: {
-                        Text("Click & Select")
-                            .font(.system(size: 20, weight: .semibold, design: .rounded))
-                            .foregroundStyle(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .fill(.white.opacity(0.12))
-                            )
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(.white.opacity(0.18), lineWidth: 1)
-                            )
-                    }
-                    .padding(.horizontal, 24)
-                    .padding(.top, 8)
-
-                    VStack(spacing: 4) {
-                        Text("Want to change platforms?")
-                            .foregroundStyle(.white.opacity(0.65))
-                            .font(.footnote)
-                        Button { } label: {
-                            Text("Go back to Login page.")
-                                .font(.footnote.weight(.semibold))
-                                .underline()
+                    // Grid
+                    ScrollView(showsIndicators: false) {
+                        LazyVGrid(columns: columns, alignment: .center, spacing: 18) {
+                            ForEach(playlists) { item in
+                                PlaylistCard(item: item, isSelected: selected?.id == item.id)
+                                    .onTapGesture {
+                                        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                            selected = item
+                                            UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                        }
+                                    }
+                            }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 6)
+
+                        InstructionCard()
+                            .padding(.horizontal, 16)
+                            .padding(.top, 10)
+
+                        // CTA — white text, dark pill (not blue)
+                        Button {
+                            UINotificationFeedbackGenerator().notificationOccurred(.success)
+                            showReady = true // ← added
+                        } label: {
+                            Text("Click & Select")
+                                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 52)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .fill(.white.opacity(0.12))
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(.white.opacity(0.18), lineWidth: 1)
+                                )
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.top, 8)
+
+                        VStack(spacing: 4) {
+                            Text("Want to change platforms?")
+                                .foregroundStyle(.white.opacity(0.65))
+                                .font(.footnote)
+                            Button { } label: {
+                                Text("Go back to Login page.")
+                                    .font(.footnote.weight(.semibold))
+                                    .underline()
+                                    .foregroundStyle(.white)
+                            }
+                        }
+                        .padding(.vertical, 18)
                     }
-                    .padding(.vertical, 18)
+                    .padding(.top, 18) // ← added space between header and playlist
                 }
-                .padding(.top, 18) // ← added space between header and playlist
+
+                // ← added (hidden link that activates when showReady becomes true)
+                NavigationLink(destination: ReadyToGoView(), isActive: $showReady) { EmptyView() }
             }
         }
         .preferredColorScheme(.dark)
@@ -175,7 +183,7 @@ struct PlaylistCard: View {
     var isSelected: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 6) {
             AsyncImage(url: item.coverURL) { phase in
                 switch phase {
                 case .empty:
@@ -274,3 +282,4 @@ struct LibraryView_Previews: PreviewProvider {
             .previewDevice("iPhone 16 Pro")
     }
 }
+
