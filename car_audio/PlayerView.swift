@@ -19,11 +19,12 @@ struct Song: Identifiable, Hashable {
     let artworkName: String?
 }
 
-// MARK: - Player Controller (with multiple songs)
+// MARK: - Player Controller (multi-song, seek-to-start, toggle)
 
 final class SimpleAVPlayerController: NSObject, ObservableObject {
     @Published private(set) var songs: [Song] = []
     @Published private(set) var currentIndex: Int = 0
+    @Published private(set) var isPlaying: Bool = false
 
     private let player = AVQueuePlayer()
     private var items: [AVPlayerItem] = []
@@ -36,7 +37,12 @@ final class SimpleAVPlayerController: NSObject, ObservableObject {
         self.items = songs.map { AVPlayerItem(url: $0.url) }
         if let first = items.first { player.replaceCurrentItem(with: first) }
 
-        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        // Allow playback to continue while recording for speech
+        try? AVAudioSession.sharedInstance().setCategory(
+            .playAndRecord,
+            mode: .default,
+            options: [.mixWithOthers, .defaultToSpeaker]
+        )
         try? AVAudioSession.sharedInstance().setActive(true)
 
         NotificationCenter.default.addObserver(
@@ -47,21 +53,25 @@ final class SimpleAVPlayerController: NSObject, ObservableObject {
         )
     }
 
-    func play()  { player.play() }
-    func pause() { player.pause() }
+    func play()  { player.play();  isPlaying = true }
+    func pause() { player.pause(); isPlaying = false }
+    func toggle() { isPlaying ? pause() : play() }
 
+    // Always restart from the beginning when switching
     func next() {
         guard !items.isEmpty else { return }
         currentIndex = (currentIndex + 1) % items.count
         player.replaceCurrentItem(with: items[currentIndex])
-        player.play()
+        player.seek(to: .zero)
+        play()
     }
 
     func previous() {
         guard !items.isEmpty else { return }
         currentIndex = (currentIndex - 1 + items.count) % items.count
         player.replaceCurrentItem(with: items[currentIndex])
-        player.play()
+        player.seek(to: .zero)
+        play()
     }
 
     func setVolume(relative delta: Float) {
@@ -73,6 +83,7 @@ final class SimpleAVPlayerController: NSObject, ObservableObject {
         if let idx = songs.firstIndex(where: { $0.title.lowercased().contains(text.lowercased()) }) {
             currentIndex = idx
             player.replaceCurrentItem(with: items[currentIndex])
+            player.seek(to: .zero)
         }
         play()
     }
@@ -82,7 +93,7 @@ final class SimpleAVPlayerController: NSObject, ObservableObject {
     }
 }
 
-// MARK: - Speech Recognizer
+// MARK: - Speech Recognizer (permissions + keeps music playing)
 
 final class VoiceCommander: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -94,16 +105,38 @@ final class VoiceCommander: NSObject, ObservableObject {
     private var task: SFSpeechRecognitionTask?
     private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
 
+    // Ask for speech + mic permissions up front
     func requestAuthorization() {
+        let group = DispatchGroup()
+        var speechOK = false
+        var micOK = false
+
+        group.enter()
         SFSpeechRecognizer.requestAuthorization { status in
-            DispatchQueue.main.async { self.isAuthorized = (status == .authorized) }
+            speechOK = (status == .authorized)
+            group.leave()
+        }
+
+        group.enter()
+        AVAudioSession.sharedInstance().requestRecordPermission { granted in
+            micOK = granted
+            group.leave()
+        }
+
+        group.notify(queue: .main) {
+            self.isAuthorized = (speechOK && micOK)
         }
     }
 
     func start() throws {
         guard !isListening else { return }
-        try AVAudioSession.sharedInstance().setCategory(.record, mode: .measurement, options: .duckOthers)
-        try AVAudioSession.sharedInstance().setActive(true, options: .notifyOthersOnDeactivation)
+
+        // Allow recording while playback continues
+        let session = AVAudioSession.sharedInstance()
+        try session.setCategory(.playAndRecord,
+                                mode: .measurement,
+                                options: [.mixWithOthers, .defaultToSpeaker, .allowBluetooth])
+        try session.setActive(true, options: .notifyOthersOnDeactivation)
 
         let req = SFSpeechAudioBufferRecognitionRequest()
         req.shouldReportPartialResults = true
@@ -137,8 +170,11 @@ final class VoiceCommander: NSObject, ObservableObject {
         task?.cancel()
         request = nil
         task = nil
-        DispatchQueue.main.async { self.isListening = false }
+
+        // Deactivate recording; playback continues under app's session
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
+
+        DispatchQueue.main.async { self.isListening = false }
     }
 }
 
@@ -163,7 +199,7 @@ struct VoiceCommandRouter {
     }
 }
 
-// MARK: - Animated Orb (no glow)
+// MARK: - Animated Orb
 
 struct CorsaSiriImage: View {
     var isListening: Bool
@@ -190,7 +226,7 @@ struct CorsaSiriImage: View {
                     .offset(x: x, y: y)
                     .shadow(color: .white.opacity(0.18), radius: isListening ? 12 : 6, y: 2)
             }
-            .frame(width: baseSize, height: baseSize)
+            .frame(width: 300, height: 200)
         }
         .drawingGroup()
     }
@@ -201,16 +237,18 @@ struct CorsaSiriImage: View {
 struct PlayerView: View {
     @StateObject private var voice = VoiceCommander()
 
-    // 🎵 Add as many songs as you like here
+    // 🎵 Add as many songs as you like here (ensure files exist in bundle)
     @StateObject private var player = SimpleAVPlayerController(songs: [
         Song(title: "Legends",
              artist: "Lil Baby ft. Quavo",
              url: Bundle.main.url(forResource: "Legends", withExtension: "mp3")!,
              artworkName: "image5"),
-        Song(title: "Out Of My Hands", artist: "Future",
+        Song(title: "Out Of My Hands",
+             artist: "Future",
              url: Bundle.main.url(forResource: "Out Of My Hands", withExtension: "mp3")!,
              artworkName: "image5"),
-        Song(title: "Plastic Bag", artist: "Future ft. Drake",
+        Song(title: "Plastic Bag",
+             artist: "Future ft. Drake",
              url: Bundle.main.url(forResource: "Plastic Bag", withExtension: "mp3")!,
              artworkName: "image5")
     ])
@@ -255,7 +293,7 @@ struct PlayerView: View {
 
                 VStack(spacing: 12) {
                     CorsaSiriImage(isListening: voice.isListening)
-                    Text(voice.isListening ? "Corsa is listening" : "Tap mic or say 'Hey Corsa'")
+                    Text(voice.isListening ? "Corsa is listening" : "Tap mic to start voice commands")
                         .italic()
                         .foregroundStyle(.white.opacity(0.85))
                 }
@@ -275,26 +313,32 @@ struct PlayerView: View {
 
                 // Controls
                 HStack(spacing: 46) {
-                    Button { player.previous(); UIImpactFeedbackGenerator(style: .light).impactOccurred() } label: {
+                    Button {
+                        player.previous()
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } label: {
                         Image(systemName: "backward.end.alt.fill")
                             .font(.system(size: 30, weight: .semibold))
                             .foregroundStyle(.white)
                     }
 
                     Button {
-                        player.play()
+                        player.toggle()
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
                         ZStack {
                             Circle().fill(.white.opacity(0.15)).frame(width: 68, height: 68)
                                 .overlay(Circle().stroke(.white.opacity(0.25), lineWidth: 1))
-                            Image(systemName: "play.fill")
+                            Image(systemName: player.isPlaying ? "pause.fill" : "play.fill")
                                 .font(.system(size: 28, weight: .bold))
                                 .foregroundStyle(.white)
                         }
                     }
 
-                    Button { player.next(); UIImpactFeedbackGenerator(style: .light).impactOccurred() } label: {
+                    Button {
+                        player.next()
+                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    } label: {
                         Image(systemName: "forward.end.alt.fill")
                             .font(.system(size: 30, weight: .semibold))
                             .foregroundStyle(.white)
@@ -308,8 +352,9 @@ struct PlayerView: View {
                 HStack {
                     Spacer()
                     Button {
-                        if voice.isListening { voice.stop() }
-                        else {
+                        if voice.isListening {
+                            voice.stop()
+                        } else {
                             if !voice.isAuthorized { voice.requestAuthorization() }
                             Task { try? voice.start() }
                         }
@@ -344,4 +389,3 @@ struct PlayerView_Previews: PreviewProvider {
             .previewDevice("iPhone 16 Pro")
     }
 }
-
