@@ -8,6 +8,8 @@
 import SwiftUI
 import AVFoundation
 import Speech
+import UIKit
+
 
 // MARK: - Model
 
@@ -93,45 +95,31 @@ final class SimpleAVPlayerController: NSObject, ObservableObject {
     }
 }
 
-// MARK: - Speech Recognizer (permissions + keeps music playing)
+// MARK: - Speech Recognizer (fires on partials, callback-based)
 
 final class VoiceCommander: NSObject, ObservableObject {
     @Published var isAuthorized = false
     @Published var isListening = false
     @Published var lastHeard: String = ""
 
+    /// Called on every partial/full recognition update with the *raw* text (lowercased).
+    var onRecognized: ((String) -> Void)?
+
     private let audioEngine = AVAudioEngine()
     private var request: SFSpeechAudioBufferRecognitionRequest?
     private var task: SFSpeechRecognitionTask?
     private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
 
-    // Ask for speech + mic permissions up front
     func requestAuthorization() {
-        let group = DispatchGroup()
-        var speechOK = false
-        var micOK = false
-
-        group.enter()
         SFSpeechRecognizer.requestAuthorization { status in
-            speechOK = (status == .authorized)
-            group.leave()
+            DispatchQueue.main.async { self.isAuthorized = (status == .authorized) }
         }
-
-        group.enter()
-        AVAudioSession.sharedInstance().requestRecordPermission { granted in
-            micOK = granted
-            group.leave()
-        }
-
-        group.notify(queue: .main) {
-            self.isAuthorized = (speechOK && micOK)
-        }
+        AVAudioSession.sharedInstance().requestRecordPermission { _ in }
     }
 
     func start() throws {
         guard !isListening else { return }
 
-        // Allow recording while playback continues
         let session = AVAudioSession.sharedInstance()
         try session.setCategory(.playAndRecord,
                                 mode: .measurement,
@@ -155,9 +143,14 @@ final class VoiceCommander: NSObject, ObservableObject {
         task = recognizer?.recognitionTask(with: req) { [weak self] result, error in
             guard let self else { return }
             if let r = result {
-                DispatchQueue.main.async { self.lastHeard = r.bestTranscription.formattedString }
+                let text = r.bestTranscription.formattedString.lowercased()
+                DispatchQueue.main.async { self.lastHeard = text }
+                // Route instantly on every partial update (fast + responsive)
+                self.onRecognized?(text)
             }
-            if error != nil || (result?.isFinal == true) { self.stop() }
+            if error != nil {
+                self.stop()
+            }
         }
 
         DispatchQueue.main.async { self.isListening = true }
@@ -170,30 +163,48 @@ final class VoiceCommander: NSObject, ObservableObject {
         task?.cancel()
         request = nil
         task = nil
-
-        // Deactivate recording; playback continues under app's session
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
-
         DispatchQueue.main.async { self.isListening = false }
     }
 }
 
-// MARK: - Voice Commands
+// MARK: - Voice Commands (robust, tolerant matching)
 
 struct VoiceCommandRouter {
     static func handle(text: String, player: SimpleAVPlayerController) {
-        let t = text.lowercased()
+        let t = text // already lowercased by caller
 
-        if t.contains("pause") || t.contains("stop") { player.pause(); return }
-        if t.contains("next") || t.contains("skip")  { player.next(); return }
-        if t.contains("previous") || t.contains("back") { player.previous(); return }
-        if t.contains("volume up")   || t.contains("turn it up")   { player.setVolume(relative: +0.15); return }
-        if t.contains("volume down") || t.contains("turn it down") { player.setVolume(relative: -0.15); return }
+        // --- Pause ---
+        if t.contains("pause") || t.contains("stop") || t.contains("quiet") {
+            player.pause(); return
+        }
 
-        if let r = t.range(of: "play ") {
-            let q = String(t[r.upperBound...]).trimmingCharacters(in: .whitespaces)
-            if q.isEmpty { player.play() } else { player.playQuery(q) }
-        } else if t.contains("play") {
+        // --- Next ---
+        if t.contains("next") || t.contains("skip") || t.contains("forward") || t.contains("skip track") || t.contains("skip song") {
+            player.next(); return
+        }
+
+        // --- Previous ---
+        if t.contains("previous") || t.contains("prev") || t.contains("back") || t.contains("go back") || t.contains("last song") {
+            player.previous(); return
+        }
+
+        // --- Volume Up ---
+        if t.contains("volume up") || t.contains("turn up") || t.contains("turn it up") || t.contains("louder") || t.contains("increase volume") || t.contains("raise volume") {
+            player.setVolume(relative: +0.15); return
+        }
+
+        // --- Volume Down ---
+        if t.contains("volume down") || t.contains("turn down") || t.contains("turn it down") || t.contains("quieter") || t.contains("decrease volume") || t.contains("lower volume") {
+            player.setVolume(relative: -0.15); return
+        }
+
+        // --- Play Specific Song / Play ---
+        if t.contains("play") {
+            if let idx = player.songs.firstIndex(where: { t.contains($0.title.lowercased()) }) {
+                player.playQuery(player.songs[idx].title)
+                return
+            }
             player.play()
         }
     }
@@ -358,7 +369,8 @@ struct PlayerView: View {
                             if !voice.isAuthorized { voice.requestAuthorization() }
                             Task { try? voice.start() }
                         }
-                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                        UINotificationFeedbackGenerator().notificationOccurred(.success)
+
                     } label: {
                         Image(systemName: voice.isListening ? "mic.fill" : "mic")
                             .font(.system(size: 18, weight: .bold))
@@ -373,10 +385,13 @@ struct PlayerView: View {
                 Spacer()
             }
         }
-        .onChange(of: voice.lastHeard) { text in
-            VoiceCommandRouter.handle(text: text, player: player)
+        .onAppear {
+            voice.requestAuthorization()
+            // Wire the voice recognizer to your player
+            voice.onRecognized = { recognizedText in
+                VoiceCommandRouter.handle(text: recognizedText, player: player)
+            }
         }
-        .onAppear { voice.requestAuthorization() }
         .preferredColorScheme(.dark)
     }
 }
