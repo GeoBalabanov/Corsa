@@ -46,7 +46,6 @@ struct LibraryView: View {
                             RoundIcon(system: "magnifyingglass")
                             RoundIcon(system: "plus")
                         }
-
                         Spacer(minLength: 8)
 
                         HStack(spacing: 12) {
@@ -58,7 +57,7 @@ struct LibraryView: View {
                         }
                     }
                     .padding(.horizontal, 16)
-                    .padding(.top, 6)
+                    .padding(.top, 70)
 
                     // Grid
                     ScrollView(showsIndicators: false) {
