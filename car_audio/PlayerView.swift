@@ -9,7 +9,7 @@ import SwiftUI
 import AVFoundation
 import Speech
 
-// MARK: - Playback abstraction (plug your Spotify controller here)
+// MARK: - Playback abstraction (swap to Spotify/MusicKit later if you want)
 
 protocol PlayerController {
     func play()
@@ -22,19 +22,78 @@ protocol PlayerController {
     func playQuery(_ text: String)
 }
 
-// Temporary mock so the view runs. Replace with your real Spotify controller.
-final class MockSpotifyController: PlayerController {
-    func play() { print("▶️ play") }
-    func pause() { print("⏸ pause") }
-    func next() { print("⏭ next") }
-    func previous() { print("⏮ previous") }
-    func setShuffle(_ on: Bool) { print("🔀 shuffle:", on) }
-    func setRepeat(_ on: Bool) { print("🔁 repeat:", on) }
-    func setVolume(relative delta: Float) { print("🔊 volume delta:", delta) }
-    func playQuery(_ text: String) { print("🎯 play query:", text) }
+// MARK: - Simple AVPlayer-backed controller (actually plays audio)
+
+final class SimpleAVPlayerController: NSObject, PlayerController {
+    private let player = AVQueuePlayer()
+    private var items: [AVPlayerItem] = []
+    private var index = 0
+
+    /// Provide your own audio URLs (remote HTTPS streams or local bundle files).
+    init(urls: [URL] = [
+        // Replace these with your tracks
+        URL(string: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It_is_time_for_adventure/Komiku_-_03_-_Friends.mp3")!,
+        URL(string: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It_is_time_for_adventure/Komiku_-_13_-_Battle_of_Pogs.mp3")!
+    ]) {
+        super.init()
+        self.items = urls.map { AVPlayerItem(url: $0) }
+        if let first = items.first { player.replaceCurrentItem(with: first) }
+
+        // Playback category so app audio is audible even if mic is active at times.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
+    }
+
+    func play()  { player.play() }
+    func pause() { player.pause() }
+
+    func next() {
+        guard !items.isEmpty else { return }
+        index = (index + 1) % items.count
+        player.replaceCurrentItem(with: items[index])
+        player.play()
+    }
+
+    func previous() {
+        guard !items.isEmpty else { return }
+        index = (index - 1 + items.count) % items.count
+        player.replaceCurrentItem(with: items[index])
+        player.play()
+    }
+
+    func setShuffle(_ on: Bool) {
+        guard on, !items.isEmpty else { return }
+        items.shuffle()
+        index = 0
+        player.replaceCurrentItem(with: items[index])
+        player.play()
+    }
+
+    func setRepeat(_ on: Bool) {
+        // Simple repeat-all behavior
+        if on {
+            NotificationCenter.default.addObserver(self, selector: #selector(loopIfNeeded), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        } else {
+            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        }
+    }
+
+    @objc private func loopIfNeeded() {
+        next()
+    }
+
+    func setVolume(relative delta: Float) {
+        let v = max(0, min(1, player.volume + delta))
+        player.volume = v
+    }
+
+    func playQuery(_ text: String) {
+        // Demo: just starts playing (hook actual search here if desired)
+        play()
+    }
 }
 
-// MARK: - Speech recognizer
+// MARK: - Speech recognizer (unchanged)
 
 final class VoiceCommander: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -51,7 +110,7 @@ final class VoiceCommander: NSObject, ObservableObject {
             DispatchQueue.main.async { self.isAuthorized = (status == .authorized) }
         }
     }
-    
+
     func start() throws {
         guard !isListening else { return }
         try AVAudioSession.sharedInstance().setCategory(.record, mode: .measurement, options: .duckOthers)
@@ -112,7 +171,6 @@ struct VoiceCommandRouter {
         if t.contains("volume up")   || t.contains("turn it up")   { player.setVolume(relative: +0.15); return }
         if t.contains("volume down") || t.contains("turn it down") { player.setVolume(relative: -0.15); return }
 
-        // "play ..." → search/resolve via Spotify
         if let r = t.range(of: "play ") {
             let q = String(t[r.upperBound...]).trimmingCharacters(in: .whitespaces)
             if q.isEmpty { player.play() } else { player.playQuery(q) }
@@ -122,7 +180,7 @@ struct VoiceCommandRouter {
     }
 }
 
-// MARK: - Siri-style animated image using your asset `image5`
+// MARK: - Siri-style animated orb 
 
 struct CorsaSiriImage: View {
     var isListening: Bool
@@ -143,15 +201,6 @@ struct CorsaSiriImage: View {
             let y     = CGFloat(cos(t * speed * 0.8)) * wiggle
 
             ZStack {
-                // soft glow
-                Circle()
-                    .fill(.white.opacity(isListening ? 0.18 : 0.10))
-                    .frame(width: baseSize * 1.35, height: baseSize * 1.35)
-                    .blur(radius: isListening ? 28 : 18)
-                    .scaleEffect(scale)
-                    .blendMode(.plusLighter)
-
-                // your image5 orb
                 Image("image5")
                     .resizable()
                     .scaledToFit()
@@ -159,7 +208,7 @@ struct CorsaSiriImage: View {
                     .rotationEffect(rot)
                     .scaleEffect(scale)
                     .offset(x: x, y: y)
-                    .shadow(color: .white.opacity(0.25), radius: isListening ? 16 : 8, y: 3)
+                    .shadow(color: .white.opacity(0.18), radius: isListening ? 12 : 6, y: 2)
             }
             .frame(width: baseSize, height: baseSize)
         }
@@ -168,46 +217,13 @@ struct CorsaSiriImage: View {
     }
 }
 
-// MARK: - Spotlight overlay (for the leather highlight)
-
-struct EllipticalSpotlight: View {
-    var center: UnitPoint
-    var radius: CGSize
-
-    var body: some View {
-        GeometryReader { geo in
-            let m = min(geo.size.width, geo.size.height)
-            let w = m * radius.width
-            let h = m * radius.height
-            let x = geo.size.width  * center.x
-            let y = geo.size.height * center.y
-
-            RadialGradient(
-                stops: [
-                    .init(color: .white.opacity(0.28), location: 0.0),
-                    .init(color: .white.opacity(0.10), location: 0.28),
-                    .init(color: .clear,               location: 1.0)
-                ],
-                center: .center, startRadius: 0, endRadius: max(w, h)
-            )
-            .frame(width: w * 2.0, height: h * 2.0)
-            .position(x: x, y: y)
-            .scaleEffect(x: 1.0, y: h / w)
-            .blur(radius: 22)
-            .blendMode(.plusLighter)
-            .ignoresSafeArea()
-            .allowsHitTesting(false)
-        }
-    }
-}
-
 // MARK: - Player Screen
 
 struct PlayerView: View {
     @StateObject private var voice = VoiceCommander()
-    private let player: PlayerController = MockSpotifyController() // swap with real controller
+    private let player: PlayerController = SimpleAVPlayerController() // 🔊 now plays real audio
 
-    // Demo text; replace with live Spotify now playing
+    // Demo text; replace with live "now playing" if you wire to a service
     @State private var trackTitle = "Blinding Lights"
     @State private var trackArtist = "The Weeknd"
     @State private var nowPlayingBanner = "Late night drive is currently playing"
@@ -223,9 +239,6 @@ struct PlayerView: View {
                     .clipped()
                     .ignoresSafeArea()
             }
-
-            EllipticalSpotlight(center: .init(x: 0.40, y: 0.52),
-                                radius: .init(width: 0.95, height: 0.55))
 
             VStack(spacing: 24) {
                 // Now playing banner
@@ -281,7 +294,7 @@ struct PlayerView: View {
                     }
 
                     Button {
-                        player.play() // toggle with your real state
+                        player.play() // toggle with your real state if needed
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
                         ZStack {
