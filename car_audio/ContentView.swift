@@ -9,16 +9,13 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        // LibraryView already contains its own NavigationStack
+        // and pushes to ReadyToGoView / PlayerView from its buttons.
+        LibraryView()
     }
 }
 
 #Preview {
     ContentView()
 }
+

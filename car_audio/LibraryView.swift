@@ -20,7 +20,7 @@ struct Playlist: Identifiable {
 
 struct LibraryView: View {
     @State private var selected: Playlist? = nil
-    @State private var showReady = false 
+    @State private var showReady = false
 
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 18), count: 3)
 
@@ -34,9 +34,10 @@ struct LibraryView: View {
     ]
 
     var body: some View {
-        NavigationStack { // ← added
+        NavigationStack {
             ZStack {
-                LeatherBackdropReplica()     // ← background image
+                // ✅ REAL, FULL-SCREEN BACKDROP (covers under the home indicator)
+                LeatherBackdropReplica()
 
                 VStack(spacing: 16) {
                     // Header — left icons, middle spacer, right title+avatar
@@ -79,10 +80,10 @@ struct LibraryView: View {
                             .padding(.horizontal, 16)
                             .padding(.top, 50)
 
-                        // CTA — white text, dark pill (not blue)
+                        // CTA Button
                         Button {
                             UINotificationFeedbackGenerator().notificationOccurred(.success)
-                            showReady = true // ← added
+                            showReady = true
                         } label: {
                             Text("Click & Select")
                                 .font(.system(size: 20, weight: .semibold, design: .rounded))
@@ -114,10 +115,10 @@ struct LibraryView: View {
                         }
                         .padding(.vertical, 18)
                     }
-                    .padding(.top, 18) // ← added space between header and playlist
+                    .padding(.top, 18)
                 }
 
-                // ← added (hidden link that activates when showReady becomes true)
+                // Hidden NavigationLink trigger
                 NavigationLink(destination: ReadyToGoView(), isActive: $showReady) { EmptyView() }
             }
         }
@@ -125,37 +126,27 @@ struct LibraryView: View {
     }
 }
 
-// MARK: - Background (now uses image4)
+// MARK: - Background (robust loader for file OR asset)
 
 struct LeatherBackdropReplica: View {
     var body: some View {
-        GeometryReader { geo in
-            if let ui = UIImage(named: "image4") {
+        Group {
+            if let ui = UIImage(named: "image4") {      // file in bundle OR asset
                 Image(uiImage: ui)
                     .resizable()
                     .scaledToFill()
-                    .frame(width: geo.size.width, height: geo.size.height)
-                    .clipped()
-                    .ignoresSafeArea(edges: .all)
-                    // ↓ ensure it fully covers the bottom edge on every device
-                    .scaleEffect(1.08, anchor: .bottom)  // slight zoom, anchored at bottom
-                    .offset(y: 8)                        // nudge down a bit
+            } else if UIImage(named: "image4.png") != nil,   // sometimes extension matters
+                      let ui = UIImage(named: "image4.png") {
+                Image(uiImage: ui)
+                    .resizable()
+                    .scaledToFill()
             } else {
+                // Last resort: neutral gradient
                 LinearGradient(colors: [Color.black, Color.black.opacity(0.94)],
                                startPoint: .topLeading, endPoint: .bottomTrailing)
-                    .ignoresSafeArea(edges: .all)
-                    .overlay(
-                        Text("⚠️ Add asset named \"image4\" to your target")
-                            .font(.footnote).padding(8)
-                            .background(.black.opacity(0.6))
-                            .cornerRadius(8)
-                            .foregroundStyle(.white)
-                            .padding(),
-                        alignment: .topLeading
-                    )
-                    .ignoresSafeArea()
             }
         }
+        .ignoresSafeArea() // <- important
     }
 }
 
@@ -215,8 +206,14 @@ struct PlaylistCard: View {
             .overlay {
                 if isSelected {
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(LinearGradient(colors: [.white.opacity(0.9), .white.opacity(0.2)],
-                                               startPoint: .topLeading, endPoint: .bottomTrailing), lineWidth: 2)
+                        .stroke(
+                            LinearGradient(
+                                colors: [.white.opacity(0.9), .white.opacity(0.2)],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
                 }
             }
 
@@ -286,4 +283,3 @@ struct LibraryView_Previews: PreviewProvider {
             .previewDevice("iPhone 16 Pro")
     }
 }
-

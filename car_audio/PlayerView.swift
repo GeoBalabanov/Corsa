@@ -9,39 +9,42 @@ import SwiftUI
 import AVFoundation
 import Speech
 
-// MARK: - Playback abstraction (swap to Spotify/MusicKit later if you want)
+// MARK: - Model
 
-protocol PlayerController {
-    func play()
-    func pause()
-    func next()
-    func previous()
-    func setShuffle(_ on: Bool)
-    func setRepeat(_ on: Bool)
-    func setVolume(relative delta: Float) // -1...+1
-    func playQuery(_ text: String)
+struct Song: Identifiable, Hashable {
+    let id = UUID()
+    let title: String
+    let artist: String
+    let url: URL
+    let artworkName: String?
 }
 
-// MARK: - Simple AVPlayer-backed controller (actually plays audio)
+// MARK: - Player Controller (with multiple songs)
 
-final class SimpleAVPlayerController: NSObject, PlayerController {
+final class SimpleAVPlayerController: NSObject, ObservableObject {
+    @Published private(set) var songs: [Song] = []
+    @Published private(set) var currentIndex: Int = 0
+
     private let player = AVQueuePlayer()
     private var items: [AVPlayerItem] = []
-    private var index = 0
 
-    /// Provide your own audio URLs (remote HTTPS streams or local bundle files).
-    init(urls: [URL] = [
-        // Replace these with your tracks
-        URL(string: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It_is_time_for_adventure/Komiku_-_03_-_Friends.mp3")!,
-        URL(string: "https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Komiku/It_is_time_for_adventure/Komiku_-_13_-_Battle_of_Pogs.mp3")!
-    ]) {
+    var currentSong: Song? { songs.indices.contains(currentIndex) ? songs[currentIndex] : nil }
+
+    init(songs: [Song]) {
         super.init()
-        self.items = urls.map { AVPlayerItem(url: $0) }
+        self.songs = songs
+        self.items = songs.map { AVPlayerItem(url: $0.url) }
         if let first = items.first { player.replaceCurrentItem(with: first) }
 
-        // Playback category so app audio is audible even if mic is active at times.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
+
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(itemDidFinish),
+            name: .AVPlayerItemDidPlayToEndTime,
+            object: nil
+        )
     }
 
     func play()  { player.play() }
@@ -49,37 +52,16 @@ final class SimpleAVPlayerController: NSObject, PlayerController {
 
     func next() {
         guard !items.isEmpty else { return }
-        index = (index + 1) % items.count
-        player.replaceCurrentItem(with: items[index])
+        currentIndex = (currentIndex + 1) % items.count
+        player.replaceCurrentItem(with: items[currentIndex])
         player.play()
     }
 
     func previous() {
         guard !items.isEmpty else { return }
-        index = (index - 1 + items.count) % items.count
-        player.replaceCurrentItem(with: items[index])
+        currentIndex = (currentIndex - 1 + items.count) % items.count
+        player.replaceCurrentItem(with: items[currentIndex])
         player.play()
-    }
-
-    func setShuffle(_ on: Bool) {
-        guard on, !items.isEmpty else { return }
-        items.shuffle()
-        index = 0
-        player.replaceCurrentItem(with: items[index])
-        player.play()
-    }
-
-    func setRepeat(_ on: Bool) {
-        // Simple repeat-all behavior
-        if on {
-            NotificationCenter.default.addObserver(self, selector: #selector(loopIfNeeded), name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        } else {
-            NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
-        }
-    }
-
-    @objc private func loopIfNeeded() {
-        next()
     }
 
     func setVolume(relative delta: Float) {
@@ -88,12 +70,19 @@ final class SimpleAVPlayerController: NSObject, PlayerController {
     }
 
     func playQuery(_ text: String) {
-        // Demo: just starts playing (hook actual search here if desired)
+        if let idx = songs.firstIndex(where: { $0.title.lowercased().contains(text.lowercased()) }) {
+            currentIndex = idx
+            player.replaceCurrentItem(with: items[currentIndex])
+        }
         play()
+    }
+
+    @objc private func itemDidFinish(_ note: Notification) {
+        next()
     }
 }
 
-// MARK: - Speech recognizer (unchanged)
+// MARK: - Speech Recognizer
 
 final class VoiceCommander: NSObject, ObservableObject {
     @Published var isAuthorized = false
@@ -153,21 +142,15 @@ final class VoiceCommander: NSObject, ObservableObject {
     }
 }
 
-// MARK: - Voice → actions
+// MARK: - Voice Commands
 
 struct VoiceCommandRouter {
-    static func handle(text: String, player: PlayerController) {
+    static func handle(text: String, player: SimpleAVPlayerController) {
         let t = text.lowercased()
 
         if t.contains("pause") || t.contains("stop") { player.pause(); return }
         if t.contains("next") || t.contains("skip")  { player.next(); return }
         if t.contains("previous") || t.contains("back") { player.previous(); return }
-
-        if t.contains("shuffle on")  { player.setShuffle(true);  return }
-        if t.contains("shuffle off") { player.setShuffle(false); return }
-        if t.contains("repeat on")   { player.setRepeat(true);   return }
-        if t.contains("repeat off")  { player.setRepeat(false);  return }
-
         if t.contains("volume up")   || t.contains("turn it up")   { player.setVolume(relative: +0.15); return }
         if t.contains("volume down") || t.contains("turn it down") { player.setVolume(relative: -0.15); return }
 
@@ -180,7 +163,7 @@ struct VoiceCommandRouter {
     }
 }
 
-// MARK: - Siri-style animated orb 
+// MARK: - Animated Orb (no glow)
 
 struct CorsaSiriImage: View {
     var isListening: Bool
@@ -189,12 +172,9 @@ struct CorsaSiriImage: View {
     var body: some View {
         TimelineView(.animation) { timeline in
             let t = timeline.date.timeIntervalSinceReferenceDate
-
-            // Faster, livelier motion when listening
             let speed  = isListening ? 1.8 : 0.7
             let pulseA = isListening ? 0.08 : 0.035
             let wiggle = isListening ? 10.0 : 4.0
-
             let scale = 1 + pulseA * CGFloat(sin(t * speed))
             let rot   = Angle(degrees: Double(sin(t * speed * 0.6)) * (isListening ? 4 : 1.6))
             let x     = CGFloat(sin(t * speed * 0.9)) * wiggle * 0.4
@@ -213,24 +193,31 @@ struct CorsaSiriImage: View {
             .frame(width: baseSize, height: baseSize)
         }
         .drawingGroup()
-        .accessibilityHidden(true)
     }
 }
 
-// MARK: - Player Screen
+// MARK: - Player View
 
 struct PlayerView: View {
     @StateObject private var voice = VoiceCommander()
-    private let player: PlayerController = SimpleAVPlayerController() // 🔊 now plays real audio
 
-    // Demo text; replace with live "now playing" if you wire to a service
-    @State private var trackTitle = "Blinding Lights"
-    @State private var trackArtist = "The Weeknd"
-    @State private var nowPlayingBanner = "Late night drive is currently playing"
+    // 🎵 Add as many songs as you like here
+    @StateObject private var player = SimpleAVPlayerController(songs: [
+        Song(title: "Legends",
+             artist: "Lil Baby ft. Quavo",
+             url: Bundle.main.url(forResource: "Legends", withExtension: "mp3")!,
+             artworkName: "image5"),
+        Song(title: "Out Of My Hands", artist: "Future",
+             url: Bundle.main.url(forResource: "Out Of My Hands", withExtension: "mp3")!,
+             artworkName: "image5"),
+        Song(title: "Plastic Bag", artist: "Future ft. Drake",
+             url: Bundle.main.url(forResource: "Plastic Bag", withExtension: "mp3")!,
+             artworkName: "image5")
+    ])
 
     var body: some View {
         ZStack {
-            // Background leather (image3)
+            // Background
             GeometryReader { geo in
                 Image("image3")
                     .resizable()
@@ -247,11 +234,13 @@ struct PlayerView: View {
                         .fill(.white.opacity(0.15))
                         .frame(width: 40, height: 40)
                         .overlay(
-                            Image("image5")
-                                .resizable().scaledToFill()
+                            Image(player.currentSong?.artworkName ?? "image5")
+                                .resizable()
+                                .scaledToFill()
                                 .clipShape(RoundedRectangle(cornerRadius: 8))
                         )
-                    Text(nowPlayingBanner)
+
+                    Text("\(player.currentSong?.title ?? "—") is currently playing")
                         .foregroundStyle(.white.opacity(0.92))
                         .font(.system(size: 14, weight: .semibold))
                         .lineLimit(1)
@@ -264,7 +253,6 @@ struct PlayerView: View {
 
                 Spacer()
 
-                // Siri-like animated image + subtitle
                 VStack(spacing: 12) {
                     CorsaSiriImage(isListening: voice.isListening)
                     Text(voice.isListening ? "Corsa is listening" : "Tap mic or say 'Hey Corsa'")
@@ -274,18 +262,18 @@ struct PlayerView: View {
 
                 Spacer()
 
-                // Title + artist
+                // Song info
                 VStack(spacing: 6) {
-                    Text(trackTitle)
+                    Text(player.currentSong?.title ?? "—")
                         .font(.system(size: 34, weight: .semibold, design: .rounded))
                         .foregroundStyle(.white)
-                    Text(trackArtist)
+                    Text(player.currentSong?.artist ?? "—")
                         .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(.white.opacity(0.75))
                 }
                 .padding(.bottom, 8)
 
-                // Transport controls
+                // Controls
                 HStack(spacing: 46) {
                     Button { player.previous(); UIImpactFeedbackGenerator(style: .light).impactOccurred() } label: {
                         Image(systemName: "backward.end.alt.fill")
@@ -294,7 +282,7 @@ struct PlayerView: View {
                     }
 
                     Button {
-                        player.play() // toggle with your real state if needed
+                        player.play()
                         UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     } label: {
                         ZStack {
@@ -315,7 +303,7 @@ struct PlayerView: View {
                 .padding(.bottom, 30)
             }
 
-            // Mic toggle
+            // Mic Button
             VStack {
                 HStack {
                     Spacer()
@@ -339,7 +327,6 @@ struct PlayerView: View {
                 .padding(.top, 12)
                 Spacer()
             }
-            .allowsHitTesting(true)
         }
         .onChange(of: voice.lastHeard) { text in
             VoiceCommandRouter.handle(text: text, player: player)
@@ -357,3 +344,4 @@ struct PlayerView_Previews: PreviewProvider {
             .previewDevice("iPhone 16 Pro")
     }
 }
+
