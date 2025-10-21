@@ -1,9 +1,3 @@
-# Car App
-
-
-
-## Getting started
-
 # 🎧 Corsa – Minimal Car Audio Experience
 
 **Corsa** is a SwiftUI-based car audio app designed to make music control effortless and distraction-free while driving.  
@@ -66,10 +60,9 @@ Corsa is built fully in **SwiftUI**, following Apple’s Human Interface Guideli
 **My part:**  
 - LandingView  
 - RegistrationView  
-- PlaylistChoiceView  
 
 **Zhan’s part:**  
-- PlayerView  
+- PlaylistChoiceView 
 - Voice control & car-ready mode  
 
 We worked on separate **GitLab branches** to avoid conflicts, then merged everything into `main` after review.  
@@ -131,17 +124,47 @@ Each phase ended with feedback sessions, helping us refine the app step by step.
 
 ---
 
-## 💬 Feedback & Reflection
+## 🧠 Technical Overview
 
-We had multiple feedback sessions with our teachers, especially with **Luuk**, who helped us refine the app’s safety concept.  
-From those meetings came ideas like **Drive Mode**, **audio feedback**, and **full voice control**, which we later integrated into the concept.
+Corsa is built entirely in **SwiftUI**, using a simple and modular architecture that makes each screen independent but connected through a shared navigation flow.  
+The app focuses on **safety, simplicity, and performance**, keeping the UI reactive and lightweight for real-time use while driving.
 
-Working on Corsa taught me how to merge design and development in a structured way — from initial research to a real, working prototype.  
-It also helped me understand teamwork, version control, and how to keep a project simple but meaningful.
 
-> “Keep it simple, keep it focused, and keep the driver listening — not looking.”
+### 🪄 How It Works
+
+1. **LandingView** – the app opens with a minimal intro screen and a gradient background.  
+   Users tap “To register” to move into the next step.  
+
+2. **RegistrationView** – users choose their preferred platform (**Spotify / Apple Music / YouTube Music**)  
+   and paste their profile or playlist link. In future versions, this connects via the APIs.
+
+3. **PlaylistChoiceView** – after login, the app shows available playlists (currently sample data).  
+   This screen will later load dynamic playlists from the selected music provider.
+
+4. **ReadyView & PlayerView** – once the user selects a playlist, the app transitions to the player.  
+   The player has only three large buttons: **Previous**, **Play/Pause**, and **Next**, plus optional voice control.
+
+### 🗣 Voice Integration
+
+Voice features are built using Apple’s **Speech framework**.  
+The app listens for simple commands such as *“Play,” “Pause,” “Next,”* and *“Stop.”*  
+In future versions, a “Hey Corsa” wake word will be added using **VoiceKit** or background speech recognition.
+
+### 🔊 APIs & Data Flow
+
+- **Spotify Web API** → fetches user playlists and track data via OAuth (planned).  
+- **Apple MusicKit** → fetches library data and integrates with user tokens (planned).  
+- **YouTube Data API** → retrieves playlists and video metadata (planned).  
+- **Firebase** → handles optional authentication and user preferences storage.
+
+All views communicate through lightweight models that store user data in memory during the session.  
+This keeps the app fast and avoids unnecessary network requests while driving.
 
 ---
+
+
+
+
 
 © 2025 Georgi Balabanov & Zhan Hristov – University Project
 
