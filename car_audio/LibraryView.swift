@@ -21,6 +21,7 @@ struct Playlist: Identifiable {
 struct LibraryView: View {
     @State private var selected: Playlist? = nil
     @State private var showReady = false
+    @State private var showSearch = false   // 👈 NEW
 
     private let columns: [GridItem] = Array(repeating: .init(.flexible(), spacing: 18), count: 3)
 
@@ -43,7 +44,15 @@ struct LibraryView: View {
                     // Header — left icons, middle spacer, right title+avatar
                     HStack(spacing: 12) {
                         HStack(spacing: 12) {
-                            RoundIcon(system: "magnifyingglass")
+                            // 👇 Wrap the search icon with a button. Visuals unchanged.
+                            Button {
+                                showSearch = true
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                            } label: {
+                                RoundIcon(system: "magnifyingglass")
+                            }
+                            .buttonStyle(.plain)
+
                             RoundIcon(system: "plus")
                         }
                         Spacer(minLength: 8)
@@ -121,6 +130,87 @@ struct LibraryView: View {
                 NavigationLink(destination: ReadyToGoView(), isActive: $showReady) { EmptyView() }
             }
         }
+        // 👇 Present a native search sheet (no layout/design changes to the main screen)
+        .sheet(isPresented: $showSearch) {
+            LibrarySearchSheet(
+                allPlaylists: playlists,
+                preselected: selected
+            ) { pick in
+                selected = pick
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
+}
+
+// MARK: - Search Sheet (self-contained, no change to main design)
+
+struct LibrarySearchSheet: View {
+    let allPlaylists: [Playlist]
+    let preselected: Playlist?
+    var onPick: (Playlist) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var query: String = ""
+
+    private var results: [Playlist] {
+        guard !query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return allPlaylists }
+        let q = query.lowercased()
+        return allPlaylists.filter {
+            $0.title.lowercased().contains(q) || $0.subtitle.lowercased().contains(q)
+        }
+    }
+
+    var body: some View {
+        NavigationStack {
+            List(results, id: \.id) { p in
+                HStack(spacing: 12) {
+                    AsyncImage(url: p.coverURL) { phase in
+                        switch phase {
+                        case .empty:
+                            RoundedRectangle(cornerRadius: 8).fill(.gray.opacity(0.25))
+                                .frame(width: 48, height: 48)
+                        case .success(let image):
+                            image.resizable().scaledToFill()
+                                .frame(width: 48, height: 48)
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                        case .failure:
+                            RoundedRectangle(cornerRadius: 8).fill(.gray.opacity(0.25))
+                                .overlay(Image(systemName: "music.note.list"))
+                                .frame(width: 48, height: 48)
+                        @unknown default:
+                            Color.clear.frame(width: 48, height: 48)
+                        }
+                    }
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(p.title).font(.headline)
+                        Text(p.subtitle).font(.subheadline).foregroundStyle(.secondary)
+                    }
+
+                    Spacer()
+
+                    if preselected?.id == p.id {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundStyle(.tint)
+                    }
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    UINotificationFeedbackGenerator().notificationOccurred(.success)
+                    onPick(p)
+                    dismiss()
+                }
+            }
+            .listStyle(.insetGrouped)
+            .navigationTitle("Search")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") { dismiss() }
+                }
+            }
+            .searchable(text: $query, placement: .navigationBarDrawer(displayMode: .always), prompt: "Playlists, creators…")
+        }
         .preferredColorScheme(.dark)
     }
 }
@@ -130,22 +220,21 @@ struct LibraryView: View {
 struct LeatherBackdropReplica: View {
     var body: some View {
         Group {
-            if let ui = UIImage(named: "image4") {      // file in bundle OR asset
+            if let ui = UIImage(named: "image4") {
                 Image(uiImage: ui)
                     .resizable()
                     .scaledToFill()
-            } else if UIImage(named: "image4.png") != nil,   // sometimes extension matters
+            } else if UIImage(named: "image4.png") != nil,
                       let ui = UIImage(named: "image4.png") {
                 Image(uiImage: ui)
                     .resizable()
                     .scaledToFill()
             } else {
-                // Last resort: neutral gradient
                 LinearGradient(colors: [Color.black, Color.black.opacity(0.94)],
                                startPoint: .topLeading, endPoint: .bottomTrailing)
             }
         }
-        .ignoresSafeArea() // <- important
+        .ignoresSafeArea()
     }
 }
 
@@ -282,3 +371,4 @@ struct LibraryView_Previews: PreviewProvider {
             .previewDevice("iPhone 16 Pro")
     }
 }
+
