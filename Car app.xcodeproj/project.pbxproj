@@ -35,14 +35,14 @@
 			path = "Car app";
 			sourceTree = "<group>";
 		};
-		3906E2BE2EA131B200FEA0CB /* car_audioTests */ = {
+		3906E2BE2EA131B200FEA0CB /* Car appTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = car_audioTests;
+			path = "Car appTests";
 			sourceTree = "<group>";
 		};
-		3906E2C82EA131B200FEA0CB /* car_audioUITests */ = {
+		3906E2C82EA131B200FEA0CB /* Car appUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = car_audioUITests;
+			path = "Car appUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -76,8 +76,8 @@
 			isa = PBXGroup;
 			children = (
 				3906E2B02EA131B000FEA0CB /* Car app */,
-				3906E2BE2EA131B200FEA0CB /* car_audioTests */,
-				3906E2C82EA131B200FEA0CB /* car_audioUITests */,
+				3906E2BE2EA131B200FEA0CB /* Car appTests */,
+				3906E2C82EA131B200FEA0CB /* Car appUITests */,
 				3906E2AF2EA131B000FEA0CB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -131,7 +131,7 @@
 				3906E2BD2EA131B200FEA0CB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3906E2BE2EA131B200FEA0CB /* car_audioTests */,
+				3906E2BE2EA131B200FEA0CB /* Car appTests */,
 			);
 			name = car_audioTests;
 			packageProductDependencies = (
@@ -154,7 +154,7 @@
 				3906E2C72EA131B200FEA0CB /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				3906E2C82EA131B200FEA0CB /* car_audioUITests */,
+				3906E2C82EA131B200FEA0CB /* Car appUITests */,
 			);
 			name = car_audioUITests;
 			packageProductDependencies = (
