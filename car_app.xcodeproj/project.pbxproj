@@ -6,223 +6,263 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		39EB1D922EA8F5DF00C07A74 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39EB1D912EA8F5DF00C07A74 /* XCTest.framework */; platformFilter = ios; };
+		39EB1D942EA8FFE500C07A74 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 39EB1D912EA8F5DF00C07A74 /* XCTest.framework */; platformFilter = ios; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
-		800624BF2EA10D6E00668977 /* PBXContainerItemProxy */ = {
+		3906E2C62EA131B200FEA0CB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 800624A92EA10D6D00668977 /* Project object */;
+			containerPortal = 3906E2A62EA131B000FEA0CB /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 800624B02EA10D6D00668977;
-			remoteInfo = "Car app";
+			remoteGlobalIDString = 3906E2AD2EA131B000FEA0CB;
+			remoteInfo = car_audio;
 		};
-		800624C92EA10D6E00668977 /* PBXContainerItemProxy */ = {
+		39EB1D8B2EA8F44800C07A74 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
-			containerPortal = 800624A92EA10D6D00668977 /* Project object */;
+			containerPortal = 3906E2A62EA131B000FEA0CB /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 800624B02EA10D6D00668977;
-			remoteInfo = "Car app";
+			remoteGlobalIDString = 3906E2AD2EA131B000FEA0CB;
+			remoteInfo = car_app;
 		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		800624B12EA10D6D00668977 /* Car app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Car app.app"; sourceTree = BUILT_PRODUCTS_DIR; };
-		800624BE2EA10D6E00668977 /* Car appTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Car appTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		800624C82EA10D6E00668977 /* Car appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Car appUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3906E2AE2EA131B000FEA0CB /* car_app.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = car_app.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3906E2C52EA131B200FEA0CB /* car_appUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = car_appUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39EB1D872EA8F44800C07A74 /* car_appTests2.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = car_appTests2.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		39EB1D912EA8F5DF00C07A74 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		39EB1D932EA8FC0700C07A74 /* car_app.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = car_app.xctestplan; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		39EB1D962EA900F200C07A74 /* Exceptions for "car_appUITests" folder in "car_app" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Car_appUITests.swift,
+				Car_appUITestsLaunchTests.swift,
+			);
+			target = 3906E2AD2EA131B000FEA0CB /* car_app */;
+		};
+		39EB1D972EA900F200C07A74 /* Exceptions for "car_appUITests" folder in "car_appUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Car_appUITests.swift,
+				Car_appUITestsLaunchTests.swift,
+			);
+			target = 3906E2C42EA131B200FEA0CB /* car_appUITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		800624B32EA10D6D00668977 /* Car app */ = {
+		3906E2B02EA131B000FEA0CB /* car_app */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Car app";
+			path = car_app;
 			sourceTree = "<group>";
 		};
-		800624C12EA10D6E00668977 /* Car appTests */ = {
+		39EB1D762EA85E7500C07A74 /* car_appUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Car appTests";
+			exceptions = (
+				39EB1D962EA900F200C07A74 /* Exceptions for "car_appUITests" folder in "car_app" target */,
+				39EB1D972EA900F200C07A74 /* Exceptions for "car_appUITests" folder in "car_appUITests" target */,
+			);
+			path = car_appUITests;
 			sourceTree = "<group>";
 		};
-		800624CB2EA10D6E00668977 /* Car appUITests */ = {
+		39EB1D882EA8F44800C07A74 /* car_appTests2 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Car appUITests";
+			path = car_appTests2;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		800624AE2EA10D6D00668977 /* Frameworks */ = {
+		3906E2AB2EA131B000FEA0CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624BB2EA10D6E00668977 /* Frameworks */ = {
+		3906E2C22EA131B200FEA0CB /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39EB1D942EA8FFE500C07A74 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624C52EA10D6E00668977 /* Frameworks */ = {
+		39EB1D842EA8F44800C07A74 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				39EB1D922EA8F5DF00C07A74 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		800624A82EA10D6C00668977 = {
+		3906E2A52EA131B000FEA0CB = {
 			isa = PBXGroup;
 			children = (
-				800624B32EA10D6D00668977 /* Car app */,
-				800624C12EA10D6E00668977 /* Car appTests */,
-				800624CB2EA10D6E00668977 /* Car appUITests */,
-				800624B22EA10D6D00668977 /* Products */,
+				39EB1D932EA8FC0700C07A74 /* car_app.xctestplan */,
+				3906E2B02EA131B000FEA0CB /* car_app */,
+				39EB1D762EA85E7500C07A74 /* car_appUITests */,
+				39EB1D882EA8F44800C07A74 /* car_appTests2 */,
+				39EB1D902EA8F5DF00C07A74 /* Frameworks */,
+				3906E2AF2EA131B000FEA0CB /* Products */,
 			);
 			sourceTree = "<group>";
 		};
-		800624B22EA10D6D00668977 /* Products */ = {
+		3906E2AF2EA131B000FEA0CB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				800624B12EA10D6D00668977 /* Car app.app */,
-				800624BE2EA10D6E00668977 /* Car appTests.xctest */,
-				800624C82EA10D6E00668977 /* Car appUITests.xctest */,
+				3906E2AE2EA131B000FEA0CB /* car_app.app */,
+				3906E2C52EA131B200FEA0CB /* car_appUITests.xctest */,
+				39EB1D872EA8F44800C07A74 /* car_appTests2.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		39EB1D902EA8F5DF00C07A74 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				39EB1D912EA8F5DF00C07A74 /* XCTest.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		800624B02EA10D6D00668977 /* Car app */ = {
+		3906E2AD2EA131B000FEA0CB /* car_app */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 800624D22EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car app" */;
+			buildConfigurationList = 3906E2CF2EA131B200FEA0CB /* Build configuration list for PBXNativeTarget "car_app" */;
 			buildPhases = (
-				800624AD2EA10D6D00668977 /* Sources */,
-				800624AE2EA10D6D00668977 /* Frameworks */,
-				800624AF2EA10D6D00668977 /* Resources */,
+				3906E2AA2EA131B000FEA0CB /* Sources */,
+				3906E2AB2EA131B000FEA0CB /* Frameworks */,
+				3906E2AC2EA131B000FEA0CB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				800624B32EA10D6D00668977 /* Car app */,
+				3906E2B02EA131B000FEA0CB /* car_app */,
+				39EB1D762EA85E7500C07A74 /* car_appUITests */,
 			);
-			name = "Car app";
+			name = car_app;
 			packageProductDependencies = (
 			);
-			productName = "Car app";
-			productReference = 800624B12EA10D6D00668977 /* Car app.app */;
+			productName = car_audio;
+			productReference = 3906E2AE2EA131B000FEA0CB /* car_app.app */;
 			productType = "com.apple.product-type.application";
 		};
-		800624BD2EA10D6E00668977 /* Car appTests */ = {
+		3906E2C42EA131B200FEA0CB /* car_appUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 800624D52EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car appTests" */;
+			buildConfigurationList = 3906E2D52EA131B200FEA0CB /* Build configuration list for PBXNativeTarget "car_appUITests" */;
 			buildPhases = (
-				800624BA2EA10D6E00668977 /* Sources */,
-				800624BB2EA10D6E00668977 /* Frameworks */,
-				800624BC2EA10D6E00668977 /* Resources */,
+				3906E2C12EA131B200FEA0CB /* Sources */,
+				3906E2C22EA131B200FEA0CB /* Frameworks */,
+				3906E2C32EA131B200FEA0CB /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				800624C02EA10D6E00668977 /* PBXTargetDependency */,
+				3906E2C72EA131B200FEA0CB /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				800624C12EA10D6E00668977 /* Car appTests */,
-			);
-			name = "Car appTests";
+			name = car_appUITests;
 			packageProductDependencies = (
 			);
-			productName = "Car appTests";
-			productReference = 800624BE2EA10D6E00668977 /* Car appTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
-		800624C72EA10D6E00668977 /* Car appUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 800624D82EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car appUITests" */;
-			buildPhases = (
-				800624C42EA10D6E00668977 /* Sources */,
-				800624C52EA10D6E00668977 /* Frameworks */,
-				800624C62EA10D6E00668977 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				800624CA2EA10D6E00668977 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				800624CB2EA10D6E00668977 /* Car appUITests */,
-			);
-			name = "Car appUITests";
-			packageProductDependencies = (
-			);
-			productName = "Car appUITests";
-			productReference = 800624C82EA10D6E00668977 /* Car appUITests.xctest */;
+			productName = car_audioUITests;
+			productReference = 3906E2C52EA131B200FEA0CB /* car_appUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		39EB1D862EA8F44800C07A74 /* car_appTests2 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 39EB1D8D2EA8F44800C07A74 /* Build configuration list for PBXNativeTarget "car_appTests2" */;
+			buildPhases = (
+				39EB1D832EA8F44800C07A74 /* Sources */,
+				39EB1D842EA8F44800C07A74 /* Frameworks */,
+				39EB1D852EA8F44800C07A74 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				39EB1D8C2EA8F44800C07A74 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				39EB1D882EA8F44800C07A74 /* car_appTests2 */,
+			);
+			name = car_appTests2;
+			packageProductDependencies = (
+			);
+			productName = car_appTests2;
+			productReference = 39EB1D872EA8F44800C07A74 /* car_appTests2.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		800624A92EA10D6D00668977 /* Project object */ = {
+		3906E2A62EA131B000FEA0CB /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1640;
 				LastUpgradeCheck = 1640;
 				TargetAttributes = {
-					800624B02EA10D6D00668977 = {
+					3906E2AD2EA131B000FEA0CB = {
 						CreatedOnToolsVersion = 16.4;
 					};
-					800624BD2EA10D6E00668977 = {
+					3906E2C42EA131B200FEA0CB = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 800624B02EA10D6D00668977;
+						TestTargetID = 3906E2AD2EA131B000FEA0CB;
 					};
-					800624C72EA10D6E00668977 = {
+					39EB1D862EA8F44800C07A74 = {
 						CreatedOnToolsVersion = 16.4;
-						TestTargetID = 800624B02EA10D6D00668977;
+						TestTargetID = 3906E2AD2EA131B000FEA0CB;
 					};
 				};
 			};
-			buildConfigurationList = 800624AC2EA10D6D00668977 /* Build configuration list for PBXProject "Car app" */;
+			buildConfigurationList = 3906E2A92EA131B000FEA0CB /* Build configuration list for PBXProject "car_app" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
 			);
-			mainGroup = 800624A82EA10D6C00668977;
+			mainGroup = 3906E2A52EA131B000FEA0CB;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = 800624B22EA10D6D00668977 /* Products */;
+			productRefGroup = 3906E2AF2EA131B000FEA0CB /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				800624B02EA10D6D00668977 /* Car app */,
-				800624BD2EA10D6E00668977 /* Car appTests */,
-				800624C72EA10D6E00668977 /* Car appUITests */,
+				3906E2AD2EA131B000FEA0CB /* car_app */,
+				3906E2C42EA131B200FEA0CB /* car_appUITests */,
+				39EB1D862EA8F44800C07A74 /* car_appTests2 */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		800624AF2EA10D6D00668977 /* Resources */ = {
+		3906E2AC2EA131B000FEA0CB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624BC2EA10D6E00668977 /* Resources */ = {
+		3906E2C32EA131B200FEA0CB /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624C62EA10D6E00668977 /* Resources */ = {
+		39EB1D852EA8F44800C07A74 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -232,21 +272,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		800624AD2EA10D6D00668977 /* Sources */ = {
+		3906E2AA2EA131B000FEA0CB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624BA2EA10D6E00668977 /* Sources */ = {
+		3906E2C12EA131B200FEA0CB /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		800624C42EA10D6E00668977 /* Sources */ = {
+		39EB1D832EA8F44800C07A74 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -256,20 +296,20 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		800624C02EA10D6E00668977 /* PBXTargetDependency */ = {
+		3906E2C72EA131B200FEA0CB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 800624B02EA10D6D00668977 /* Car app */;
-			targetProxy = 800624BF2EA10D6E00668977 /* PBXContainerItemProxy */;
+			target = 3906E2AD2EA131B000FEA0CB /* car_app */;
+			targetProxy = 3906E2C62EA131B200FEA0CB /* PBXContainerItemProxy */;
 		};
-		800624CA2EA10D6E00668977 /* PBXTargetDependency */ = {
+		39EB1D8C2EA8F44800C07A74 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 800624B02EA10D6D00668977 /* Car app */;
-			targetProxy = 800624C92EA10D6E00668977 /* PBXContainerItemProxy */;
+			target = 3906E2AD2EA131B000FEA0CB /* car_app */;
+			targetProxy = 39EB1D8B2EA8F44800C07A74 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		800624D02EA10D6E00668977 /* Debug */ = {
+		3906E2CD2EA131B200FEA0CB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -304,7 +344,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -333,7 +373,7 @@
 			};
 			name = Debug;
 		};
-		800624D12EA10D6E00668977 /* Release */ = {
+		3906E2CE2EA131B200FEA0CB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -368,7 +408,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -390,16 +430,18 @@
 			};
 			name = Release;
 		};
-		800624D32EA10D6E00668977 /* Debug */ = {
+		3906E2D02EA131B200FEA0CB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Mic needed for voice commands.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "We use speech to control playback.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -410,7 +452,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-audio";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -418,16 +460,19 @@
 			};
 			name = Debug;
 		};
-		800624D42EA10D6E00668977 /* Release */ = {
+		3906E2D12EA131B200FEA0CB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = car_audio/car_audioRelease.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Mic needed for voice commands.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "We use speech to control playback.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -438,7 +483,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-app";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-audio";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -446,118 +491,116 @@
 			};
 			name = Release;
 		};
-		800624D62EA10D6E00668977 /* Debug */ = {
+		3906E2D62EA131B200FEA0CB /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-audioUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Car app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Car app";
+				TEST_TARGET_NAME = car_audio;
 			};
 			name = Debug;
 		};
-		800624D72EA10D6E00668977 /* Release */ = {
+		3906E2D72EA131B200FEA0CB /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-appTests";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-audioUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Car app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Car app";
+				TEST_TARGET_NAME = car_audio;
 			};
 			name = Release;
 		};
-		800624D92EA10D6E00668977 /* Debug */ = {
+		39EB1D8E2EA8F44800C07A74 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-appTests2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Car app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/car_app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/car_app";
 			};
 			name = Debug;
 		};
-		800624DA2EA10D6E00668977 /* Release */ = {
+		39EB1D8F2EA8F44800C07A74 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GHHUDBXB8K;
+				DEVELOPMENT_TEAM = 9AZN8GL878;
 				GENERATE_INFOPLIST_FILE = YES;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "georgi.balabanov.Car-appUITests";
+				PRODUCT_BUNDLE_IDENTIFIER = "zhan.hristov.car-appTests2";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = "Car app";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/car_app.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/car_app";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		800624AC2EA10D6D00668977 /* Build configuration list for PBXProject "Car app" */ = {
+		3906E2A92EA131B000FEA0CB /* Build configuration list for PBXProject "car_app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				800624D02EA10D6E00668977 /* Debug */,
-				800624D12EA10D6E00668977 /* Release */,
+				3906E2CD2EA131B200FEA0CB /* Debug */,
+				3906E2CE2EA131B200FEA0CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		800624D22EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car app" */ = {
+		3906E2CF2EA131B200FEA0CB /* Build configuration list for PBXNativeTarget "car_app" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				800624D32EA10D6E00668977 /* Debug */,
-				800624D42EA10D6E00668977 /* Release */,
+				3906E2D02EA131B200FEA0CB /* Debug */,
+				3906E2D12EA131B200FEA0CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		800624D52EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car appTests" */ = {
+		3906E2D52EA131B200FEA0CB /* Build configuration list for PBXNativeTarget "car_appUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				800624D62EA10D6E00668977 /* Debug */,
-				800624D72EA10D6E00668977 /* Release */,
+				3906E2D62EA131B200FEA0CB /* Debug */,
+				3906E2D72EA131B200FEA0CB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		800624D82EA10D6E00668977 /* Build configuration list for PBXNativeTarget "Car appUITests" */ = {
+		39EB1D8D2EA8F44800C07A74 /* Build configuration list for PBXNativeTarget "car_appTests2" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				800624D92EA10D6E00668977 /* Debug */,
-				800624DA2EA10D6E00668977 /* Release */,
+				39EB1D8E2EA8F44800C07A74 /* Debug */,
+				39EB1D8F2EA8F44800C07A74 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
-	rootObject = 800624A92EA10D6D00668977 /* Project object */;
+	rootObject = 3906E2A62EA131B000FEA0CB /* Project object */;
 }

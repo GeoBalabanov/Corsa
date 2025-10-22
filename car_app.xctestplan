@@ -1,0 +1,46 @@
+{
+  "configurations" : [
+    {
+      "id" : "8476DDDD-E989-473A-A852-100EA022DA39",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:car_app.xcodeproj",
+      "identifier" : "3906E2AD2EA131B000FEA0CB",
+      "name" : "car_app"
+    }
+  },
+  "testTargets" : [
+    {
+      "enabled" : false,
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:car_app.xcodeproj",
+        "identifier" : "3906E2BA2EA131B200FEA0CB",
+        "name" : "car_appTests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:car_app.xcodeproj",
+        "identifier" : "3906E2C42EA131B200FEA0CB",
+        "name" : "car_appUITests"
+      }
+    },
+    {
+      "parallelizable" : true,
+      "target" : {
+        "containerPath" : "container:car_app.xcodeproj",
+        "identifier" : "39EB1D862EA8F44800C07A74",
+        "name" : "car_appTests2"
+      }
+    }
+  ],
+  "version" : 1
+}
